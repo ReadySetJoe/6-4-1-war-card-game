@@ -1,5 +1,7 @@
 import random
 
+import pdb
+
 class Card:
   def __init__(self, suit, val):
     self.suit = suit
@@ -155,16 +157,18 @@ def war_accumulating():
   d.shuffle()
   p1 = Player()
   cpu = Player()
+
   for i in range(26):
     p1.add_to_pile(d.draw())
   for i in range(26):
     cpu.add_to_pile(d.draw())
 
   print("Let's play War!\n\n")
-  input('Hit Enter to draw a card!')
 
   while len(p1.hand) < 52 and len(cpu.hand) < 52:
-    pot = []
+    print('I have ' + str(len(cpu.hand)+len(cpu.pile)) + ' cards and you have '  + str(len(p1.hand)+len(p1.pile)))
+    # input('Hit Enter to draw a card!')
+
     if len(p1.hand) == 0:
       random.shuffle(p1.pile)
       p1.hand = p1.pile
@@ -173,49 +177,79 @@ def war_accumulating():
       random.shuffle(cpu.pile)
       cpu.hand = cpu.pile
       cpu.pile = []
-    player_card = p1.hand.pop()
-    comp_card = cpu.hand.pop()
-    pot = [player_card, comp_card]
-    print('You drew a ' + str(player_card) + ' and I drew the ' + str(comp_card) + ' which means...')
+    try:
+      # Start the game  
+      player_card = p1.hand.pop()
+      comp_card = cpu.hand.pop()
+      pot = [player_card, comp_card]
+      print('You drew a ' + str(player_card) + ' and I drew the ' + str(comp_card) + ' which means...')
 
-    # Who won?
-    if player_card.val > comp_card.val: # The player!
-      print("You win!")
-      for card in pot:
-        p1.add_to_pile(card)
-    
-    elif player_card.val < comp_card.val: # The computer!
-      print("I win!!!! HAHAHAHHA :D")
-      for card in pot:
-        cpu.add_to_pile(card)
+      # Who won?
+      if player_card.val > comp_card.val: # The player!
+        print("You win!")
+        for card in pot:
+          p1.add_to_pile(card)
+      
+      elif player_card.val < comp_card.val: # The computer!
+        print("I win!!!! HAHAHAHHA :D")
+        for card in pot:
+          cpu.add_to_pile(card)
 
-    elif player_card.val == comp_card.val: # THE POSSIBLY ENDLESS DESTRUCTIVE CYCLE OF WAR BEGINS
-      while player_card.val == comp_card.val:
-        print("IT'S WARRRRRRRRR")
-        # Make sure there are enough cards to finish the war
-        if len(d.cards) < 4:
-          d.shuffle()
-        pot.append(d.draw()) # Burn card
-        pot.append(d.draw()) # Burn card
+      elif player_card.val == comp_card.val: # THE POSSIBLY ENDLESS DESTRUCTIVE CYCLE OF WAR BEGINS
+        pdb.set_trace()
 
-        # input('Hit Enter to draw a card!')
-        player_card = d.draw()
-        comp_card = d.draw()
-        pot.append(player_card) # Increase pot for new cards
-        pot.append(comp_card)
+        while player_card.val == comp_card.val:
+          print("IT'S WARRRRRRRRR")
+          # Make sure there are enough cards to finish the war
+          if len(p1.hand) < 2:
+            if len(p1.pile) > 2:
+              random.shuffle(p1.pile)
+              p1.hand = p1.pile
+              p1.pile = []
+            else:
+              for card in p1.hand:
+                cpu.add_to_pile(card)
+              p1.hand = []
+              break
+          if len(cpu.hand) < 2:
+            if len(cpu.pile) > 2:
+              random.shuffle(cpu.pile)
+              cpu.hand = cpu.pile
+              cpu.pile = []
+            else:
+              for card in cpu.hand:
+                p1.add_to_pile(card)
+              cpu.hand = []
+              break
 
-        print('You drew a ' + str(player_card) + ' and I drew the ' + str(comp_card) + ' which means...')
+          burn_card1 = p1.hand.pop()
+          pot.append(burn_card1) # Burn card
+          burn_card2 = cpu.hand.pop()
+          pot.append(burn_card2) # Burn card
 
-        # Who won? or will the while loop continue to run?
-        if player_card.val > comp_card.val:
-          print("You win!")
-          for card in pot:
-            p1.add_to_pile(card)
+          # input('Hit Enter to draw a card!')
+          player_card = p1.hand.pop()
+          comp_card = cpu.hand.pop()
 
-        elif player_card.val < comp_card.val:
-          print("I win!!!! HAHAHAHHA :D")
-          for card in pot:
-            cpu.add_to_pile(card)
+          pot.append(player_card) # Increase pot for new cards
+          pot.append(comp_card)
+
+          print('You drew a ' + str(player_card) + ' and I drew the ' + str(comp_card) + ' which means...')
+
+          # Who won? or will the while loop continue to run?
+          if player_card.val > comp_card.val:
+            print("You win!")
+            for card in pot:
+              p1.add_to_pile(card)
+
+          elif player_card.val < comp_card.val:
+            print("I win!!!! HAHAHAHHA :D")
+            for card in pot:
+              cpu.add_to_pile(card)
+    except:
+      break
+
+
   print(len(p1.hand))  
   print(len(cpu.hand))  
   if len(p1.hand) is 0:
